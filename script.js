@@ -58,8 +58,16 @@ const fetchNews = async (query) => {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+            let errorMessage = `Server error: ${response.status}`;
+            try {
+                // Coba parse error sebagai JSON, siapa tahu server memberikan pesan error yang detail
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorMessage;
+            } catch (e) {
+                // Jika gagal, berarti respons bukan JSON (kemungkinan halaman error HTML)
+                // Biarkan errorMessage yang sudah ada
+            }
+            throw new Error(errorMessage);
         }
         const data = await response.json();
         allArticles = data.articles.filter(article => article.title && article.description && article.urlToImage);
