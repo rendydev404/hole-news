@@ -1,5 +1,3 @@
-const apiKey = 'eb11bb2c9b384a718bf81307fd546318';
-
 // DOM Elements
 const newsContainer = document.getElementById('news-container');
 const searchInput = document.getElementById('search-input');
@@ -53,13 +51,15 @@ const fetchNews = async (query) => {
     newsContainer.classList.add('d-none');
     seeMoreButton.classList.add('d-none');
 
-    const url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`;
+    // URL sekarang menunjuk ke fungsi serverless kita
+    // Query sementara diabaikan karena fungsi backend kita masih sederhana
+    const url = `/api/get-news`;
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            if(response.status === 401) throw new Error('API Key tidak valid.');
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
         allArticles = data.articles.filter(article => article.title && article.description && article.urlToImage);
