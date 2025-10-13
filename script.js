@@ -51,9 +51,8 @@ const fetchNews = async (query) => {
     newsContainer.classList.add('d-none');
     seeMoreButton.classList.add('d-none');
 
-    // URL sekarang menunjuk ke fungsi serverless kita
-    // Query sementara diabaikan karena fungsi backend kita masih sederhana
-    const url = `/api/get-news`;
+    // URL sekarang menunjuk ke fungsi serverless kita dan menyertakan query
+    const url = `/api/get-news?q=${encodeURIComponent(query)}`;
 
     try {
         const response = await fetch(url);

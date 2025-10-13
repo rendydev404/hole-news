@@ -5,7 +5,11 @@ const fetch = require('node-fetch');
 export default async function handler(request, response) {
   // Ambil API key dari environment variable
   const apiKey = process.env.NEWS_API_KEY;
-  const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+  // Ambil query pencarian dari request, jika tidak ada, default ke "indonesia"
+  const query = request.query.q || 'indonesia';
+  
+  // Gunakan endpoint "everything" agar pencarian dan kategori berfungsi
+  const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${apiKey}`;
 
   try {
     const apiResponse = await fetch(apiUrl);
