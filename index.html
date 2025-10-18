@@ -1,96 +1,186 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News Portal Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Hole News - The Future of News</title>
+    <link rel="shortcut icon" href="assets/logo.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#4f46e5',
+                            '50': '#eef2ff',
+                            '100': '#e0e7ff',
+                            '200': '#c7d2fe',
+                            '300': '#a5b4fc',
+                            '400': '#818cf8',
+                            '500': '#6366f1',
+                            '600': '#4f46e5',
+                            '700': '#4338ca',
+                            '800': '#3730a3',
+                            '900': '#312e81',
+                            '950': '#1e1b4b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            color: #d5d5d5;
+        }
+        .dark body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .light body {
+            background-color: #e6e6e6;
+            color: #000000;
+        }
+        .light .card {
+            background-color: white;
+            color: #0f0f0f!important;
+        }
+        .dark .card {
+            background-color: #1e293b;
+            color: white;
         }
         .card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        .logo {
+        .light .category-button {
+            background-color: #747474;
+            color: white;
             font-weight: 600;
+        }
+
+        .dark .category-button.active {
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 600;
+        }
+        .dark .category-button:hover {
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 600;
+        }
+
+        .category-button.active {
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 600;
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand logo" href="#">Hole News</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <div class="category-nav btn-group flex-wrap" role="group">
-                        <button type="button" class="btn btn-outline-primary category-button active" data-category="indonesia">All</button>
-                        <button type="button" class="btn btn-outline-primary category-button" data-category="technology">Technology</button>
-                        <button type="button" class="btn btn-outline-primary category-button" data-category="business">Business</button>
-                        <button type="button" class="btn btn-outline-primary category-button" data-category="sports">Sport</button>
-                        <button type="button" class="btn btn-outline-primary category-button" data-category="health">Health</button>
-                        <button type="button" class="btn btn-outline-primary category-button" data-category="science">Science</button>
+<body class="antialiased">
+
+    <div id="app" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-lg sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <a class="flex items-center gap-2" href="#">
+                        <img src="assets/logo.png" alt="Hole News Logo" class="h-12">
+                        <span id="brand-logo-text" class="text-2xl font-bold text-black dark:text-white">Hole News</span>
+                    </a>
+                    
+                    <!-- Search and Theme Toggle -->
+                    <div class="flex items-center gap-4">
+                        <form class="hidden md:flex items-center" onsubmit="event.preventDefault(); document.getElementById('search-button').click();">
+                            <input class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-black dark:text-white rounded-l-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary" type="search" placeholder="Search news..." id="search-input">
+                            <button class="bg-primary hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-r-lg" type="button" id="search-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </form>
+                        <button id="theme-icon" class="text-slate-500 hover:text-black dark:text-slate-400 dark:hover:text-white">
+                            <!-- Icon will be inserted by JS -->
+                        </button>
                     </div>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <i id="theme-icon" class="fas fa-moon me-3" style="cursor: pointer;"></i>
-                    <form class="d-flex" role="search" onsubmit="event.preventDefault(); document.getElementById('search-button').click();">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
-                        <button class="btn btn-primary" type="button" id="search-button">Search</button>
-                    </form>
                 </div>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <main class="container my-4">
-        <div id="loader" class="d-flex justify-content-center align-items-center d-none" style="padding: 5rem;">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="visually-hidden">Loading...</span>
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Categories -->
+            <div class="mb-8">
+                <h2 class="category-text text-xl font-bold text-black dark:text-white mb-4">Categories</h2>
+                <div class="category-nav flex flex-wrap gap-2" role="group">
+                    <button type="button" class="category-button active px-4 py-2 text-sm rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-white hover:bg-primary hover:text-white transition-colors" data-category="indonesia">All</button>
+                    <button type="button" class="category-button px-4 py-2 text-sm rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-white hover:bg-primary hover:text-white transition-colors" data-category="technology">Technology</button>
+                    <button type="button" class="category-button px-4 py-2 text-sm rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-white hover:bg-primary hover:text-white transition-colors" data-category="business">Business</button>
+                    <button type="button" class="category-button px-4 py-2 text-sm rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-white hover:bg-primary hover:text-white transition-colors" data-category="sports">Sport</button>
+                    <button type="button" class="category-button px-4 py-2 text-sm rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-white hover:bg-primary hover:text-white transition-colors" data-category="health">Health</button>
+                    <button type="button" class="category-button px-4 py-2 text-sm rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-white hover:bg-primary hover:text-white transition-colors" data-category="science">Science</button>
+                </div>
+                 <!-- Search for mobile -->
+                 <form class="mt-4 md:hidden flex items-center" onsubmit="event.preventDefault(); document.getElementById('search-button-mobile').click();">
+                    <input class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-black dark:text-white w-full rounded-l-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary" type="search" placeholder="Search news..." id="search-input-mobile">
+                    <button class="bg-primary hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-r-lg" type="button" id="search-button-mobile">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </form>
             </div>
-        </div>
-        <div id="news-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 d-none">
-        </div>
-        <div class="text-center mt-4">
-            <button class="btn btn-primary d-none" id="see-more-button">See More</button>
-        </div>
-    </main>
 
-    <div class="container">
-        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-          <div class="col-md-4 d-flex align-items-center">
-            <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
-              <span class="logo fs-5">Hole News</span>
-            </a>
-            <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2025 Company, Inc</span>
-          </div>
-      
-          <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-            <li class="ms-3"><a class="text-body-secondary fs-4" href="https://x.com" target="_blank"><i class="fab fa-twitter"></i></a></li>
-            <li class="ms-3"><a class="text-body-secondary fs-4" href="https://whatsapp.com" target="_blank"><i class="fab fa-whatsapp"></i></a></li>
-            <li class="ms-3"><a class="text-body-secondary fs-4" href="https://instagram.com/rendyy_404" target="_blank"><i class="fab fa-instagram"></i></a></li>
-            <li class="ms-3"><a class="text-body-secondary fs-4" href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a></li>
-          </ul>
+            <!-- News Grid -->
+            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- News cards will be injected here -->
+            </div>
+
+            <!-- See More Button -->
+            <div class="text-center mt-12">
+                <button class="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg hidden" id="see-more-button">Load More News</button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-16">
+            <div class="container mx-auto px-4 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <a class="flex items-center justify-center md:justify-start gap-2 mb-2" href="#">
+                            <img src="assets/logo.png" alt="Hole News Logo" class="h-10">
+                            <span class="text-xl font-bold text-black dark:text-white">Hole News</span>
+                        </a>
+                        <p class="text-slate-500 dark:text-slate-400">&copy; 2025 Hole News, Inc. All rights reserved.</p>
+                    </div>
+                    <div class="flex gap-6">
+                        <a href="https://x.com" target="_blank" class="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a>
+                        <a href="https://instagram.com/rendyy_404" target="_blank" class="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.012-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.345 2.525c.636-.247 1.363-.416 2.427-.465C9.793 2.013 10.147 2 12.315 2zm0 1.624c-2.375 0-2.69.01-3.634.052-1.002.045-1.504.207-1.857.344-.467.182-.86.399-1.248.787-.388.388-.604.78-.787 1.248-.137.353-.3.855-.344 1.857-.043.944-.052 1.259-.052 3.634s.01 2.69.052 3.634c.045 1.002.207 1.504.344 1.857.182.467.399.86.787 1.248.388.388.78.604 1.248.787.353.137.855.3 1.857.344.944.043 1.259.052 3.634.052s2.69-.01 3.634-.052c1.002-.045 1.504-.207 1.857-.344.467-.182.86-.399 1.248-.787.388-.388.604-.78.787-1.248.137-.353.3.855.344-1.857.043.944.052 1.259.052 3.634s-.01-2.69-.052-3.634c-.045-1.002-.207-1.504-.344-1.857a3.27 3.27 0 00-.787-1.248 3.27 3.27 0 00-1.248-.787c-.353-.137-.855-.3-1.857-.344-.944-.043-1.259-.052-3.634-.052zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 1.624a3.51 3.51 0 110 7.02 3.51 3.51 0 010-7.02zM16.838 5.93a1.216 1.216 0 100 2.432 1.216 1.216 0 000-2.432z" clip-rule="evenodd"></path></svg></a>
+                        <a href="https://facebook.com" target="_blank" class="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path></svg></a>
+                    </div>
+                </div>
+            </div>
         </footer>
-      </div>
-      
-       <!-- <a href="#" id="to-top-button" class="btn btn-primary position-fixed bottom-0 end-0 m-3 d-none" style="z-index: 1030;">
-        <i class="fas fa-arrow-up"></i>
-    </a> -->
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="script.js"></script>
-   
 </body>
 </html>
