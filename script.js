@@ -2,30 +2,47 @@
 const newsContainer = document.getElementById('news-container');
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
+const searchInputMobile = document.getElementById('search-input-mobile');
+const searchButtonMobile = document.getElementById('search-button-mobile');
 const loader = document.getElementById('loader');
 const categoryNav = document.querySelector('.category-nav');
 const themeIcon = document.getElementById('theme-icon');
 const seeMoreButton = document.getElementById('see-more-button');
 const htmlElement = document.documentElement;
 
+// --- Icons ---
+const sunIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 6a6 6 0 100 12 6 6 0 000-12z" />
+</svg>
+`;
+const moonIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+</svg>
+`;
+
 let allArticles = [];
 let articlesToShow = 6;
+let currentCategory = 'indonesia';
+let currentQuery = '';
 
 // --- Theme Manager ---
 const applyTheme = (theme) => {
-    htmlElement.setAttribute('data-bs-theme', theme);
     if (theme === 'dark') {
-        themeIcon.classList.remove('fa-moon');
-        themeIcon.classList.add('fa-sun');
+        htmlElement.classList.add('dark');
+        htmlElement.classList.remove('light');
+        themeIcon.innerHTML = sunIcon;
     } else {
-        themeIcon.classList.remove('fa-sun');
-        themeIcon.classList.add('fa-moon');
+        htmlElement.classList.add('light');
+        htmlElement.classList.remove('dark');
+        themeIcon.innerHTML = moonIcon;
     }
     localStorage.setItem('newsTheme', theme);
 };
 
 themeIcon.addEventListener('click', () => {
-    const currentTheme = htmlElement.getAttribute('data-bs-theme');
+    const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme(newTheme);
 });
@@ -45,28 +62,42 @@ const timeAgo = (dateString) => {
     return `${days} days ago`;
 };
 
-// --- News Fetching and Displaying ---
-const fetchNews = async (query) => {
-    loader.classList.remove('d-none');
-    newsContainer.classList.add('d-none');
-    seeMoreButton.classList.add('d-none');
+// --- Skeleton Loader ---
+const displaySkeletonLoader = () => {
+    newsContainer.innerHTML = '';
+    for (let i = 0; i < 6; i++) {
+        const skeletonCard = `
+            <div class="card animate-pulse">
+                <div class="h-48 bg-slate-300 dark:bg-slate-700 rounded-t-lg"></div>
+                <div class="p-6">
+                    <div class="h-4 bg-slate-300 dark:bg-slate-700 rounded w-3/4 mb-4"></div>
+                    <div class="h-3 bg-slate-300 dark:bg-slate-700 rounded w-full mb-2"></div>
+                    <div class="h-3 bg-slate-300 dark:bg-slate-700 rounded w-5/6 mb-2"></div>
+                    <div class="h-3 bg-slate-300 dark:bg-slate-700 rounded w-4/6 mb-6"></div>
+                    <div class="flex justify-between items-center">
+                        <div class="h-8 bg-slate-300 dark:bg-slate-700 rounded w-24"></div>
+                        <div class="h-3 bg-slate-300 dark:bg-slate-700 rounded w-20"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        newsContainer.innerHTML += skeletonCard;
+    }
+};
 
-    // URL sekarang menunjuk ke fungsi serverless kita dan menyertakan query
-    const url = `/api/get-news?q=${encodeURIComponent(query)}`;
+
+// --- News Fetching and Displaying ---
+const fetchNews = async (queryOrCategory) => {
+    currentQuery = queryOrCategory;
+    displaySkeletonLoader();
+    seeMoreButton.classList.add('hidden');
+
+    const url = `/api/get-news?q=${encodeURIComponent(currentQuery)}`;
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            let errorMessage = `Server error: ${response.status}`;
-            try {
-                // Coba parse error sebagai JSON, siapa tahu server memberikan pesan error yang detail
-                const errorData = await response.json();
-                errorMessage = errorData.message || errorMessage;
-            } catch (e) {
-                // Jika gagal, berarti respons bukan JSON (kemungkinan halaman error HTML)
-                // Biarkan errorMessage yang sudah ada
-            }
-            throw new Error(errorMessage);
+            throw new Error(`Server error: ${response.status}`);
         }
         const data = await response.json();
         allArticles = data.articles.filter(article => article.title && article.description && article.urlToImage);
@@ -74,10 +105,7 @@ const fetchNews = async (query) => {
         displayNews();
     } catch (error) {
         console.error("Error fetching news:", error);
-        newsContainer.innerHTML = `<div class="col-12"><p class="text-center fs-5 text-danger">Gagal memuat berita. ${error.message}</p></div>`;
-    } finally {
-        loader.classList.add('d-none');
-        newsContainer.classList.remove('d-none');
+        newsContainer.innerHTML = `<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center text-red-500">Failed to load news. ${error.message}</div>`;
     }
 };
 
@@ -85,8 +113,8 @@ const displayNews = () => {
     newsContainer.innerHTML = '';
 
     if (!allArticles || allArticles.length === 0) {
-        newsContainer.innerHTML = '<div class="col-12"><p class="text-center fs-5">Tidak ada berita yang ditemukan.</p></div>';
-        seeMoreButton.classList.add('d-none');
+        newsContainer.innerHTML = '<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center">No news found.</div>';
+        seeMoreButton.classList.add('hidden');
         return;
     }
 
@@ -100,21 +128,17 @@ const displayNews = () => {
         });
 
         const newsCard = `
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0">
-                    <img src="${article.urlToImage}" class="card-img-top" alt="News Image" style="height: 220px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">${article.title}</h5>
-                        <p class="card-text flex-grow-1">${article.description}</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Read More</a>
-                            <div class="text-end">
-                                <small class="text-body-secondary">${timeAgo(article.publishedAt)}</small>
-                                <br>
-                                <small class="text-body-secondary">
-                                    <i class="fas fa-clock me-1"></i>${formattedDate}
-                                </small>
-                            </div>
+            <div class="card rounded-lg overflow-hidden shadow-lg dark:bg-slate-800">
+                <img src="${article.urlToImage}" alt="News Image" class="w-full h-48 object-cover">
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold mb-2">${article.title}</h3>
+                    <p class="text-slate-600 dark:text-slate-300 flex-grow">${article.description}</p>
+                    <div class="flex justify-between items-center mt-4">
+                        <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="bg-primary hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Read More</a>
+                        <div class="text-right text-sm text-slate-500 dark:text-slate-400">
+                            <span>${timeAgo(article.publishedAt)}</span>
+                            <br>
+                            <span>${formattedDate}</span>
                         </div>
                     </div>
                 </div>
@@ -124,9 +148,9 @@ const displayNews = () => {
     });
 
     if (allArticles.length > articlesToShow) {
-        seeMoreButton.classList.remove('d-none');
+        seeMoreButton.classList.remove('hidden');
     } else {
-        seeMoreButton.classList.add('d-none');
+        seeMoreButton.classList.add('hidden');
     }
 };
 
@@ -136,17 +160,31 @@ seeMoreButton.addEventListener('click', () => {
 });
 
 // --- Event Listeners ---
-searchButton.addEventListener('click', () => {
+const handleSearch = () => {
     const query = searchInput.value.trim();
-    if (query) {
-        fetchNews(query);
+    const queryMobile = searchInputMobile.value.trim();
+    const finalQuery = query || queryMobile;
+
+    if (finalQuery && finalQuery !== currentCategory) {
+        currentCategory = ''; // Reset category when searching
+        fetchNews(finalQuery);
         document.querySelector('.category-button.active')?.classList.remove('active');
     }
-});
+};
+
+searchButton.addEventListener('click', handleSearch);
+searchButtonMobile.addEventListener('click', handleSearch);
 
 searchInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
-        searchButton.click();
+        event.preventDefault();
+        handleSearch();
+    }
+});
+searchInputMobile.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        handleSearch();
     }
 });
 
@@ -158,25 +196,24 @@ categoryNav.addEventListener('click', (e) => {
         }
         e.target.classList.add('active');
         const category = e.target.dataset.category;
+        currentCategory = category;
         fetchNews(category);
     }
 });
 
-// --- Scroll to Top Button --- 
-// window.addEventListener('scroll', () => {
-//     if (window.scrollY > 200) {
-//         toTopButton.classList.remove('d-none');
-//     } else {
-//         toTopButton.classList.add('d-none');
-//     }
-// });
-
 // --- Initial Load ---
 window.addEventListener('load', () => {
     // Load saved theme
-    const savedTheme = localStorage.getItem('newsTheme') || 'light';
-    applyTheme(savedTheme);
+    const savedTheme = localStorage.getItem('newsTheme');
+    // Set theme based on saved theme or system preference
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme('dark');
+    } else {
+        applyTheme('light');
+    }
 
     // Load initial news
-    fetchNews('indonesia');
+    fetchNews(currentCategory);
 });

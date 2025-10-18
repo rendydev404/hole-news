@@ -1,5 +1,5 @@
 // Menggunakan node-fetch untuk melakukan request di lingkungan Node.js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // Fungsi handler untuk Vercel
 export default async function handler(request, response) {
