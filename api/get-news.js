@@ -8,8 +8,15 @@ export default async function handler(request, response) {
   // Ambil query pencarian dari request, jika tidak ada, default ke "indonesia"
   const query = request.query.q || 'indonesia';
   
-  // Gunakan endpoint "everything" agar pencarian dan kategori berfungsi
-  const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${apiKey}`;
+  let apiUrl;
+  // Cek jika query untuk ticker berita, gunakan endpoint top-headlines
+  if (query === 'breaking') {
+    // Mengambil berita utama dari Amerika Serikat sebagai contoh
+    apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+  } else {
+    // Gunakan endpoint "everything" untuk pencarian dan kategori
+    apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${apiKey}`;
+  }
 
   try {
     const apiResponse = await fetch(apiUrl);
